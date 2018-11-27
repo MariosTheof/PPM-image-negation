@@ -6,7 +6,6 @@ using namespace std;
 
 namespace imaging {
 
-  // παίζει τα << να είναι αρκετά αντί να κάνω read()
   float * ReadPPM(const char * filename, int * w, int * h){
 
     ifstream file(filename, ios_base::binary);
@@ -17,45 +16,45 @@ namespace imaging {
       return nullptr;
     }
 
-    // Διάβασε την πρώτη γραμμή. αν εχει 'P6'
     string line;
-    file >> line;
+    int maxBitValue = 0;
+
+    file >> line >> *w >> *h >> maxBitValue;
+
+    // Διάβασε την πρώτη γραμμή. αν εχει 'P6'
     if ( line.compare("P6") != 0) {
       cerr << "Not a P6 image" << endl;
       file.close();
       return nullptr;
     }
 
-    //read file into memory
-    file.seekg(0, file.end);
-    int fileLength = file.tellg();
-    file.seekg ( 0 , file.beg);
+    //Διάβασε εάν η μέγιστη αξια των bit δεν υπερβαίνει τις ορισμένες μας τιμές
+    if ((maxBitValue == 0) || (maxBitValue > 255)){
+      cerr << "Bit value is larger than allowed maximum or less than 0. " << endl;
 
-    //allocate memory
-    float * buffer = new float[fileLength];
-
-    //read data as a block
-    file.read(buffer, fileLength);
-
-    file.close();
-
-    /*
-
-    //// μήπως φτάνει το fileLength αντί για size ;;;
-    int size = 3 * *w * *h;
-    float * float_buffer = new float[size];
-    for (int i = 0; i < size; i++){
-      float_buffer = (buffer[i] / 255.0f );
+      return nullptr;
     }
 
-    */
 
-    //delete[] buffer;
-    return buffer;
-    //return float_buffer;
+    int size = 3 * *w * *h;
+
+    float * floatBuffer = new float[size];
+
+    unsigned char * tempBuffer = new unsigned char[size];
+
+    file.read((char*)tempBuffer, size);
+
+    for (int i = 0; i < size; i++) {
+      floatBuffer[i] = (tempBuffer[i] / 255.0f);
+    }
+
+    file.close();
+    delete[] tempBuffer;
+
+    return floatBuffer;
   }
 
-  // not done yet
+
   bool WritePPM(const float * data, int w, int h, const char * filename){
     if (data == nullptr){
       return false;
@@ -65,19 +64,22 @@ namespace imaging {
 
     if (file.fail()) {
       cerr << "File cannot be opened" << endl;
-      // Αναγκαίο ;; file.close();
-      return nullptr;
+      return false; // ή nullptr
     }
 
     int size = 3 * w * h;
-    char * temp = new char[size];
+    char * tempBuffer = new char[size];
 
     for (int i = 0; i < size; i++){
-      temp[i] = (data[i] * 255);
+      tempBuffer[i] = (data[i] * 255.0f);;
     }
 
+    file << "P6" << endl << w << endl << h << endl << "255" << endl;
+
+    file.write(tempBuffer, size);
+    file.close();
+
+    return true;
   }
-
-
 
 }
