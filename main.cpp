@@ -13,6 +13,9 @@ int main(int argc, char* argv[])
     unsigned int width, height;
     char *filename = new char[50];
 
+    char * test = new char [10];
+    test = "Hey man !";
+    cout << test;
 
     if ( argv[argc] == NULL )  {
 
@@ -21,17 +24,16 @@ int main(int argc, char* argv[])
 
 	  }
 
-    if (argc < 2 ){
+   /* if (argc < 2 ){
       cerr << "Only 2 arguments in execution needed" << endl;
       return 0; // or nullptr // or false instead
-    }
+    }*/
 
-    filename = argv[argc - 1]; // filename will be the last argument
-    cout << "input file : " << filename;
+    //filename = argv[argc - /* 1 */]; // filename will be the last argument // μάλλον είναι -1 άμα μπαίνει κατευθείαν από κονσόλα
+    cout << "input file : " << filename << endl;
 
     Image * inputImage = new Image(); // maybe switch name to image
     inputImage->load(filename, "ppm");
-
     /*
     Simply saying: To access members of a structure, use the dot operator.
     To access members of a structure through a pointer, use the arrow operator.
@@ -50,7 +52,9 @@ int main(int argc, char* argv[])
     }
 
     const Color * constNegativeImageColor = negativeImageColor;
-    inputImage->setData(constNegativeImageColor);
+    Image * negativeImage = new Image();
+
+    negativeImage->setData(constNegativeImageColor);
 
 
 
@@ -67,6 +71,6 @@ int main(int argc, char* argv[])
       cout << "Write failled" << endl;
     }
     */
-
+    system("pause");
     return 0;
 }

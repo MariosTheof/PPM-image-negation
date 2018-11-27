@@ -1,7 +1,11 @@
 #include "Image.h"
 #include "Color.h"
+#include "ppm.h"
 #include <iostream>
 #include <string.h>
+
+using namespace std;
+using namespace imaging;
 
 
 // data accessors
@@ -9,7 +13,8 @@ namespace imaging
 {
 
 Color * Image::getRawDataPtr(){
-  return buffer;
+	Color * buffer = new Color[getWidth() * getHeight() * sizeof(Color)];
+	return buffer;
 }
 
 // Ίσως πρέπει να φύγουν τα '3'.
@@ -85,21 +90,65 @@ Image::~Image(){
   delete[] buffer;
 }
 
-// ΝΟΤ DONE !!
-Image & Image::operator = (const Image & right){
-  if (buffer){
+
+Image & Image::operator = (const Image & right){ // Ουσιαστικά ορίζουμε τι συμβαίνει όταν γράφουμε  "Image img = "
+  if (buffer != nullptr){ // μπορούμε χωρίς τον buffer μας
      delete[] buffer;
   }
   width = right.width;
   height = right.height;
- // buffer =;
+
+  const Color * data_ptr = right.buffer;
+
+  buffer = new Color[height*width];
+  setData(data_ptr);
+
+  return *this;
+
 }
 
-
-// NOT DONE !!
 bool Image::load (const std::string & filename, const std::string & format){
+  //check if format is PPM
+  if ( format != "ppm") {
+    cerr << "Only PPM format is supported" << endl;
+    return false;
+  }
 
   const char * input = filename.c_str(); // converts filename to a typical c string. ( char [] )
+
+  int w;
+  int h;
+
+  float * floatBuffer = ReadPPM(input, &w, &h);
+
+  width = w;
+  height = h;
+
+  int size = w * h *3;
+  int size2 = w * h * sizeof(Color);
+
+  if (floatBuffer == nullptr){ // or NULL
+    cerr << "file read failed !" << "\n";
+    return false;
+  }
+
+  buffer = getRawDataPtr();
+
+
+  for (int i = 0 , y = 0  ; i < size  ; i+=3 , y++) {
+////  η πέτρα του σκανδάλου εδώ !!!
+		buffer[y].g = floatBuffer[i];
+		buffer[y].b = floatBuffer[i+1];
+		buffer[y].r = floatBuffer[i+2];
+
+	}
+
+  delete[] floatBuffer;
+
+  return true;
+}
+
+bool Image::save (const std:: string & filename, const std::string & format){
 
   //check if format is PPM
   if ( format != "ppm") {
@@ -107,36 +156,8 @@ bool Image::load (const std::string & filename, const std::string & format){
     return false;
   }
 
-  int width;
-  int height;
-
-  float * floatBuffer = ReadPPM(input, &width, &height);
-  if (floatBuffer == nullptr){
-    cerr << "file read failed !" << "\n";
-    return false;
-  }
-  Color * colorBuffer = new Color[w*h];
-  for (int i = 0; i < width; i++){ // Αυτό είναι λάθος σταντέ / ίσως θέλει getPixel()
-    colorBuffer->r = * floatBuffer;
-    colorBuffer->g = * floatBuffer;
-    colorBuffer->g = * floatBuffer;
-  }
-
-  width = w;
-  height = h;
-  buffer = data_ptr;
-
-  delete[] floatBuffer;
-
-  return true;
-}
-
-
-bool Image::save (const std:: string & filename, const std::string & format){
-
-  //check if format is PPM .. & if Image is initialized
   int w = width, h = height;
-const char * output = filename.c_str();
+  const char * output = filename.c_str();
 
 const Color * data_ptr = buffer;
 Color * colorBuffer = buffer;

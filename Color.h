@@ -32,7 +32,7 @@ namespace imaging
 		// members
 		component_t r, //! The red color channel (component)
 		            g, //! The green color channel (component)
-								b; //! The blue color channel (component)
+					b; //! The blue color channel (component)
 
 		// member functions
 

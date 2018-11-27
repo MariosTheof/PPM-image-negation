@@ -10,7 +10,9 @@ namespace imaging {
 
     ifstream file(filename, ios_base::binary);
 
-    if (file.fail()) {
+    cout << "File in ReadPPM method :" << filename << endl;
+
+    if (!file.is_open()) {
       cerr << "File cannot be opened" << endl;
       // Αναγκαίο ;; file.close();
       return nullptr;
@@ -19,7 +21,7 @@ namespace imaging {
     string line;
     int maxBitValue = 0;
 
-    file >> line >> *w >> *h >> maxBitValue;
+    file >> line ;
 
     // Διάβασε την πρώτη γραμμή. αν εχει 'P6'
     if ( line.compare("P6") != 0) {
@@ -27,7 +29,7 @@ namespace imaging {
       file.close();
       return nullptr;
     }
-
+    file >> *w >> *h >> maxBitValue;
     //Διάβασε εάν η μέγιστη αξια των bit δεν υπερβαίνει τις ορισμένες μας τιμές
     if ((maxBitValue == 0) || (maxBitValue > 255)){
       cerr << "Bit value is larger than allowed maximum or less than 0. " << endl;
