@@ -13,10 +13,6 @@ int main(int argc, char* argv[])
     unsigned int width, height;
     char *filename = new char[50];
 
-    char * test = new char [10];
-    test = "Hey man !";
-    cout << test;
-
     if ( argv[argc] == NULL )  {
 
 		cout << "File name of the image to load :";
@@ -32,45 +28,51 @@ int main(int argc, char* argv[])
     //filename = argv[argc - /* 1 */]; // filename will be the last argument // μάλλον είναι -1 άμα μπαίνει κατευθείαν από κονσόλα
     cout << "input file : " << filename << endl;
 
-    Image * inputImage = new Image(); // maybe switch name to image
-    inputImage->load(filename, "ppm");
+    Image * image = new Image();
+
+    image->load(filename, "ppm");
     /*
     Simply saying: To access members of a structure, use the dot operator.
     To access members of a structure through a pointer, use the arrow operator.
     */
-    width = inputImage->getWidth();
-    height = inputImage->getHeight();
+    width = image->getWidth();
+    height = image->getHeight();
 
     cout << "Image dimensions are : " << width << " x " << height << endl;
 
-    Color * negativeImageColor = inputImage->getRawDataPtr();
+    Color * negativeImageColorBuffer = image->getRawDataPtr();
 
     for (int i =0; i < width*height ; i++){
-        negativeImageColor[i].r = 1.0f - negativeImageColor[i].r;
-        negativeImageColor[i].g = 1.0f - negativeImageColor[i].g;
-        negativeImageColor[i].b = 1.0f - negativeImageColor[i].b;
+        float r = negativeImageColorBuffer[i].r; //αν δεν το θέσω σε float τότε δεν το πιάνει ως αριθμό
+        float g = negativeImageColorBuffer[i].g;
+        float b = negativeImageColorBuffer[i].b;
+
+        negativeImageColorBuffer[i].r = 1.0f - r;
+        negativeImageColorBuffer[i].g = 1.0f - g;
+        negativeImageColorBuffer[i].b = 1.0f - b;
     }
 
-    const Color * constNegativeImageColor = negativeImageColor;
-    Image * negativeImage = new Image();
+    const Color * constNegativeImageColor = negativeImageColorBuffer;
+    Image * negativeImage = new Image(width, height);
 
     negativeImage->setData(constNegativeImageColor);
 
 
 
-    /*
+
     // Write image to a new file
     string tempFile = filename;
     string copypath = tempFile.substr(0, tempFile.find_first_of('.')) + "_neg.ppm";
 
 
 
-    if (*inputImage >> copypath){ // return WritePPM  // or smth?
+    if (!negativeImage->save(copypath, "ppm")){
       cout << "New image : " << copypath << endl;
     }else {
-      cout << "Write failled" << endl;
+      cout << "Write failed" << endl;
+      return -1;
     }
-    */
-    system("pause");
+
+
     return 0;
 }

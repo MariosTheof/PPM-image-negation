@@ -43,13 +43,23 @@ void Image::setPixel(unsigned int x, unsigned int y, Color & value){
 }
 
 // or use memcpy() instead ??
-void Image::setData(const Color * & data_ptr){
-  if (getWidth() != 0 && getHeight() != 0 && buffer != nullptr){
-    unsigned int bufferSize = getHeight() * getWidth();
-    for (int i = 0; i < bufferSize; i++){
-      buffer[i] = data_ptr[i];
+void Image::setData(const Color * & data_ptr) {
+    unsigned int w, h;
+    //Color * p;
+    w = getWidth(); // τα παίρνει ως 0 γτ ;;;;
+    h = getHeight();
+    if (( getRawDataPtr() == nullptr) || (getWidth() == 0) || (getHeight() == 0)) {
+
+        cout << "Exiting..." << endl;
+
+        return;
     }
-  }
+    for (int i = 0; i < width * height; i++  ) {
+
+        buffer[i]  = data_ptr[i];
+
+    }
+
 }
 
 
@@ -125,7 +135,7 @@ bool Image::load (const std::string & filename, const std::string & format){
   height = h;
 
   int size = w * h *3;
-  int size2 = w * h * sizeof(Color);
+  //int size2 = w * h * sizeof(Color);
 
   if (floatBuffer == nullptr){ // or NULL
     cerr << "file read failed !" << "\n";
@@ -136,7 +146,7 @@ bool Image::load (const std::string & filename, const std::string & format){
 
 
   for (int i = 0 , y = 0  ; i < size  ; i+=3 , y++) {
-////  η πέτρα του σκανδάλου εδώ !!!
+
 		buffer[y].g = floatBuffer[i];
 		buffer[y].b = floatBuffer[i+1];
 		buffer[y].r = floatBuffer[i+2];
@@ -156,33 +166,31 @@ bool Image::save (const std:: string & filename, const std::string & format){
     return false;
   }
 
-  int w = width, h = height;
   const char * output = filename.c_str();
 
-const Color * data_ptr = buffer;
-Color * colorBuffer = buffer;
 
-float * floatbuffer = new float[3 * w*h];
-float * p = floatbuffer;
+  int size = width * height;
+  int size2 = width * height * sizeof(Color);
 
 
 
-for (int i = 0; i < w*h; i++) {
-  *p = colorBuffer->r;
-  p++;
-  *p = colorBuffer->g;
-  p++;
-  *p = colorBuffer->b;
-  p++;
-  colorBuffer++;
-}
+  float * floatbuffer = new float[size];
 
-bool writedone = WritePPM(floatbuffer, w, h, output);
+  for (int i = 0, y = 0 ; i < size && y < size2 ; i += 3, y++){
 
-delete[] floatbuffer;
+	  floatbuffer[i] = buffer[y].r;
+	  floatbuffer[i+1] = buffer[y].g;
+	  floatbuffer[i+2] = buffer[y].b;
+  }
 
-return writedone;
+  int w = width, h = height;
 
-}
+  bool writedone = WritePPM(floatbuffer, w, h, output);
+
+  delete[] floatbuffer;
+
+  return writedone;
+
+  }
 
 }
