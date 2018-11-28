@@ -17,41 +17,57 @@ Color * Image::getRawDataPtr(){
 	return buffer;
 }
 
-// Ίσως πρέπει να φύγουν τα '3'.
-Color Image::getPixel(unsigned int x, unsigned int y) const{
-  Color pixel;
-  if ( 0 <= x <= getWidth()  && 0 <= y <= getHeight() ){
-    pixel.r = buffer[3*y*getWidth() + 3*x].r; // ίσως πρέπει να φύγουν τα '+' ;;
-    pixel.g = buffer[3*y*getWidth() + 3*x+1].g;
-    pixel.b = buffer[3*y*getWidth() + 3*x+2].b;
-    return pixel;
-  }
-  pixel.r = 0;
-  pixel.g = 0;
-  pixel.b = 0;
-  return pixel;
+Color Image::getPixel(unsigned int x, unsigned int y) const {
 
+		Color  pixel_color;
+
+		if (x < 0 || y < 0 || x > getHeight() || y > getWidth() ) {
+
+			pixel_color.r = 0;
+			pixel_color.g = 0;
+			pixel_color.b = 0;
+			return pixel_color;
+		}
+
+		unsigned int position = x + getHeight() * y;
+
+		pixel_color.r = buffer[position].r ;
+		pixel_color.g = buffer[position].g ;
+		pixel_color.b = buffer[position].b ;
+
+		return pixel_color;
 }
 
-// Ίσως πρέπει να φύγουν τα '3'.
-void Image::setPixel(unsigned int x, unsigned int y, Color & value){
-  if ( 0 <= x <= getWidth()  && 0 <= y <= getHeight() ){
-    buffer[3 * y*getWidth() + 3 * x].r = value.r;
-    buffer[3 * y*getWidth() + 3 * x].g = value.g;
-    buffer[3 * y*getWidth() + 3 * x].b = value.b;
-  }
+void  Image::setPixel(unsigned int x, unsigned int y , Color &value)  {
+
+		if (x < 0 || y < 0 || x > getHeight() || y > getWidth()) {
+
+			return;
+		}
+		unsigned int position = x + getHeight() * y;
+		buffer[position].r = value.r;
+		buffer[position].g = value.g;
+		buffer[position].b = value.b;
+
+		return;
 }
+
+
 
 // or use memcpy() instead ??
 void Image::setData(const Color * & data_ptr) {
     unsigned int w, h;
     //Color * p;
-    w = getWidth(); // τα παίρνει ως 0 γτ ;;;;
+    w = getWidth();
     h = getHeight();
     if (( getRawDataPtr() == nullptr) || (getWidth() == 0) || (getHeight() == 0)) {
 
         cout << "Exiting..." << endl;
 
+        return;
+    }
+    if (buffer == NULL) {
+        cerr << "buffer is null" << endl;
         return;
     }
     for (int i = 0; i < width * height; i++  ) {
@@ -165,11 +181,15 @@ bool Image::save (const std:: string & filename, const std::string & format){
     cerr << "Only PPM format is supported" << endl;
     return false;
   }
+  if (buffer == NULL) {
+    cerr << "buffer is NULL" << endl;
+    return false;
+  }
 
   const char * output = filename.c_str();
 
 
-  int size = width * height;
+  int size = width * height * 3;
   int size2 = width * height * sizeof(Color);
 
 
@@ -178,13 +198,15 @@ bool Image::save (const std:: string & filename, const std::string & format){
 
   for (int i = 0, y = 0 ; i < size && y < size2 ; i += 3, y++){
 
-	  floatbuffer[i] = buffer[y].r;
+	  floatbuffer[i] = buffer[y].r; // μάλλον ο buffer επιστρέφει null
 	  floatbuffer[i+1] = buffer[y].g;
 	  floatbuffer[i+2] = buffer[y].b;
   }
 
-  int w = width, h = height;
 
+
+
+  int w = width, h = height;
   bool writedone = WritePPM(floatbuffer, w, h, output);
 
   delete[] floatbuffer;

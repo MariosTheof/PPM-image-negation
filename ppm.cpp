@@ -14,7 +14,7 @@ namespace imaging {
 
     if (!file.is_open()) {
       cerr << "File cannot be opened" << endl;
-      // Αναγκαίο ;; file.close();
+
       return nullptr;
     }
 
@@ -40,14 +40,13 @@ namespace imaging {
 
     int size = 3 * *w * *h;
 
-    float * floatBuffer = new float[size];
-
     unsigned char * tempBuffer = new unsigned char[size];
 
-    file.read((char*)tempBuffer, size);
+    file.read((char *)tempBuffer, size);
+    float * floatBuffer = new float[size];
 
     for (int i = 0; i < size; i++) {
-      floatBuffer[i] = (tempBuffer[i] / 255.0f);
+      floatBuffer[i] = ((float)((unsigned char)tempBuffer[i])) / 255.0f;
     }
 
     file.close();
@@ -78,9 +77,26 @@ namespace imaging {
 
     file << "P6" << endl << w << endl << h << endl << "255" << endl;
 
-    file.write(tempBuffer, size);
-    file.close();
+  //  for (int i = 0; i < size; i++) {
 
+  //      file << tempBuffer[i];
+
+   // }
+
+    file.write((char * ) tempBuffer, size);
+/*
+    ifstream f("Image02_neg.ppm");
+    string lines;
+    int i =0;
+    while ( (!f.fail() && !f.eof()) || i < 100 ) {
+        f >> lines;
+        cout << lines << endl;
+        i++;
+    }
+*/
+
+    file.close();
+    delete[] tempBuffer;
     return true;
   }
 

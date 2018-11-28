@@ -7,6 +7,12 @@
 using namespace std;
 using namespace imaging;
 
+/*
+TODO save() always produces false ??
+TODO pixel πράξεις dont exactly produce negative filter for the images
+*/
+
+
 // Πρώτη λέξη το όνομα αρχείου, η δεύτερη το αρχείο PPM
 int main(int argc, char* argv[])
 {
@@ -28,35 +34,27 @@ int main(int argc, char* argv[])
     //filename = argv[argc - /* 1 */]; // filename will be the last argument // μάλλον είναι -1 άμα μπαίνει κατευθείαν από κονσόλα
     cout << "input file : " << filename << endl;
 
-    Image * image = new Image();
+    Image img;
+    img.load(filename, "ppm");
+const Color c(1, 1, 1);
+	cout << img.getHeight() << endl << img.getWidth() << endl;
 
-    image->load(filename, "ppm");
-    /*
-    Simply saying: To access members of a structure, use the dot operator.
-    To access members of a structure through a pointer, use the arrow operator.
-    */
-    width = image->getWidth();
-    height = image->getHeight();
+	for (int i = 0 ; i <img.getHeight() ; i++ ) {
+		for (int y = 0; y < img.getWidth(); y++) {
 
-    cout << "Image dimensions are : " << width << " x " << height << endl;
+            Color pixel = img.getPixel(i,y);
 
-    Color * negativeImageColorBuffer = image->getRawDataPtr();
+            pixel[0] = 1.0f - pixel[0];
+            pixel[1] = 1.0f - pixel[1];
+            pixel[2] = 1.0f - pixel[2];
 
-    for (int i =0; i < width*height ; i++){
-        float r = negativeImageColorBuffer[i].r; //αν δεν το θέσω σε float τότε δεν το πιάνει ως αριθμό
-        float g = negativeImageColorBuffer[i].g;
-        float b = negativeImageColorBuffer[i].b;
+            img.setPixel(i,y , pixel);
 
-        negativeImageColorBuffer[i].r = 1.0f - r;
-        negativeImageColorBuffer[i].g = 1.0f - g;
-        negativeImageColorBuffer[i].b = 1.0f - b;
-    }
+		}
 
-    const Color * constNegativeImageColor = negativeImageColorBuffer;
-    Image * negativeImage = new Image(width, height);
+	}
 
-    negativeImage->setData(constNegativeImageColor);
-
+	//img.save(filename, "ppm");
 
 
 
@@ -66,7 +64,7 @@ int main(int argc, char* argv[])
 
 
 
-    if (!negativeImage->save(copypath, "ppm")){
+    if (img.save(copypath, "ppm")){
       cout << "New image : " << copypath << endl;
     }else {
       cout << "Write failed" << endl;
