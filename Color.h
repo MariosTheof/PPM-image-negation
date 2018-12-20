@@ -20,8 +20,8 @@ namespace imaging
 	 */
 	typedef float component_t;
 
-	#define ZERO 0.0f // Defined here as an abstract constant to match the type of component_t
-    #define CLAMP_POSITIVE(val) ((val)>ZERO?(val):ZERO)
+#define ZERO 0.0f // Defined here as an abstract constant to match the type of component_t
+#define CLAMP_POSITIVE(val) ((val)>ZERO?(val):ZERO)
 
 
 	/*! Represents a triplet of Red, Green, Blue (RGB) values.
@@ -31,19 +31,19 @@ namespace imaging
 	public:
 		// members
 		component_t r, //! The red color channel (component)
-		            g, //! The green color channel (component)
-					b; //! The blue color channel (component)
+			g, //! The green color channel (component)
+			b; //! The blue color channel (component)
 
-		// member functions
+// member functions
 
-		/*! This operator returns the index-th component of the image.
-		 *
-         *	For speed, no bounds for index values are checked.
-		 *
-		 *  \param index is the index of the component to obtain. Values should be 0, 1 or 2.
-		 *
-		 *  \return a reference to the respective color component.
-		 */
+/*! This operator returns the index-th component of the image.
+ *
+ *	For speed, no bounds for index values are checked.
+ *
+ *  \param index is the index of the component to obtain. Values should be 0, 1 or 2.
+ *
+ *  \return a reference to the respective color component.
+ */
 		component_t & operator [] (size_t index)
 		{
 			return *(&r + index);
@@ -103,5 +103,4 @@ namespace imaging
 		Color() : r(ZERO), g(ZERO), b(ZERO) {}
 	};
 }
-
 #endif
