@@ -17,7 +17,7 @@ namespace imaging {
 
 		FilterGamma();
 
-		//FilterGamma(float param);
+		FilterGamma(float powerExponent);
 
 		FilterGamma(const FilterGamma & src);
 

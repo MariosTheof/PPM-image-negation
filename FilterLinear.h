@@ -8,15 +8,15 @@ namespace imaging {
 	class FilterLinear : public Filter {
 
 	protected:
-		float a,c;
-		Vec3<float> * linearPixel;
+		//float a,c;
+		Vec3<float> * linearPixel, a, c;
 	public:
 
 		Image operator << (const Image & image);
 
 		FilterLinear();
 
-		FilterLinear(float a, float c);
+		FilterLinear(Vec3<float> a, Vec3<float> c);
 
 		//FilterLinear(float param);
 

@@ -36,6 +36,7 @@ namespace math
 		
 		const T & operator() (int x, int y) const;     
 
+		Array();
 		
 		Array(unsigned int w, unsigned int h);
 
@@ -54,7 +55,9 @@ namespace math
 
 	template <typename T>
 	T * Array<T>::getRawDataPtr() {
-		return buffer;
+		//T * buffer = new T[getWidth() * getHeight() * sizeof(T)];
+
+		return this->buffer.data();
 	}
 
 	template<typename T>
@@ -107,30 +110,52 @@ namespace math
 
 	template <typename T>
 	T & Array<T>::operator () (int x, int y) {
-		return buffer[x * y];
+		if (x >= width || y >= height) {
+			std::cout << "Error x and y are coordinated out of bounds " << std::endl;
+		}
+		return buffer[y * height + x];
 	}
 
 	template <typename T>
 	const T & Array<T>::operator () (int x, int y) const {
-		return buffer[x * y];
+		if (x >= width || y >= height) {
+			std::cout << "Error x and y are coordinated out of bounds " << std::endl;
+		}
+		return buffer[y * height + x];
 	}
+
+
+	/* Constructor Zone */
+
+	// Default constructor
+	template <typename T>
+	Array<T>::Array() : width(0), height(0) {
+
+		std::cout << "Array constructor called from image(derived class)" << std::endl;
+
+	}
+
 
 	template <typename T>
 	Array<T>::Array(unsigned int w, unsigned int h) : width(w), height(h), buffer(NULL) {}
 
 	template<typename T>
-	inline Array<T>::Array(unsigned int width, unsigned int height, const T * data_ptr)
+	inline Array<T>::Array(unsigned int width, unsigned int height, const T * data_ptr) : width(width), height(height)
 	{
-		this->width = width;
-		this->height = height;
-		this->buffer = new T[width*height * 3]; 
-		for (unsigned int i = 0; i < width*height; i++) { // μήπως setData(0) αντί του for ?? // setData(data_ptr)
-			this->buffer[i] = data_ptr[i];
-		}
+		//this->buffer = data_ptr;
+
 	}
 
 	template <typename T>
-	Array<T>::Array(const Array<T> & source) : width(source.width), height(source.height), buffer(source.buffer) {	}
+	Array<T>::Array(const Array<T> & src) {
+		this->width = src.width;
+		this->height = src.height;
+		this->buffer = new T[width*height * 3];
+		for (unsigned int i = 0; i < width*height; i++) { // μήπως setData(0) αντί του for ?? // setData(data_ptr)
+			this->buffer[i] = src.buffer[i];
+		}
+
+	}
 
 	template <typename T>
 	Array<T> & Array<T>::operator = (const Array<T> & src) {

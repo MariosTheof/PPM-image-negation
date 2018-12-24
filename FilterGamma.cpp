@@ -1,5 +1,4 @@
-﻿
-#include "Filter.h"
+﻿#include "Filter.h"
 #include "FilterGamma.h"
 #include <iostream>
 #include <cmath>
@@ -11,22 +10,26 @@ namespace imaging {
 			if (powerExponent >= 0.5 && powerExponent <= 2.0) {
 
 				unsigned int index = 0;
-				Image tempImg(image.getWidth(), image.getHeight());
+				Image tempImg;
+				tempImg = image;
+				
 				for (unsigned int i = 0; i < image.getWidth(); i++) {
 					for (unsigned int y = 0; y < image.getHeight(); y++) {
 						/*
 						p`(x,y) = p(x,y)^exp
 						*/
 					
-						gammaPixel[index].r = pow(image.getItemByCoordinates(i, y).r, powerExponent);
-						gammaPixel[index].g = pow(image.getItemByCoordinates(i, y).g, powerExponent);
-						gammaPixel[index].b = pow(image.getItemByCoordinates(i, y).b, powerExponent);
 						
 						//Ready from Vec3.h functions
-						gammaPixel[index] = gammaPixel[index].clampToUpperBound(1.0);
-						gammaPixel[index] = gammaPixel[index].clampToLowerBound(0.0);
+						//gammaPixel[index] = gammaPixel[index].clampToUpperBound(1.0);
+						//gammaPixel[index] = gammaPixel[index].clampToLowerBound(0.0);
 
-						tempImg.setItemByCoordinates(i, y,* gammaPixel); // προσοχή εδώ έβαλα pointer
+			
+						
+						tempImg(i, y).r = pow(tempImg(i, y).r, powerExponent);
+						tempImg(i, y).g = pow(tempImg(i, y).g, powerExponent);
+						tempImg(i, y).b = pow(tempImg(i, y).b, powerExponent);
+						
 						index++;
 					}
 				}
@@ -44,10 +47,10 @@ namespace imaging {
 
 	FilterGamma::FilterGamma() {}
 	
-	/*FilterGamma::FilterGamma(float powerExponent)
+	FilterGamma::FilterGamma(float powerExponent)
 	{ //μάλλον περιττό
 		this->powerExponent = powerExponent;
-	}*/
+	}
 
 	FilterGamma::FilterGamma(const FilterGamma & src)
 	{

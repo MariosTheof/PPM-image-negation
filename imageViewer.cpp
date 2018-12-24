@@ -7,47 +7,75 @@
 #include "ppm.h"
 #include "Filter.h"
 
+#include "FilterGamma.h"
+#include "FilterLinear.h"
+
 
 using namespace std;
 using namespace imaging;
 
+//argc = numberOfArguments // argv = argument vector
+int main(int argc, char * argv[]) {
 
-// Πρώτη λέξη το όνομα αρχείου, η δεύτερη το αρχείο PPM
-int main(int argc, char* argv[])
-{
-	char *filename = new char[50];
-
-	if (argv[argc] == NULL) {
-
-		cout << "File name of the image to load :";
-		cin >> filename;
+	string inputFile;
+	
+	inputFile = argv[argc - 1];
+	int dotfound = inputFile.find_first_of('.');
+	if (dotfound <= -1 || inputFile.substr(inputFile.find_first_of('.')).compare(".ppm") != 0) {
+		cerr << "Incorrect or non-existant file has been given !" << endl;
+		return -1;
 
 	}
 
-	cout << "input file : " << filename << endl;
-
 	Image img;
-
-	img.load(filename, "ppm");
 	
+	img.load(inputFile, "ppm"); 
 	cout << "Image dimensions are " << img.getHeight() << " X " << img.getWidth() << endl;
 
-/*	for (int i = 0; i < img.getHeight(); i++) {
-		for (int y = 0; y < img.getWidth(); y++) {
+	int i = 0;
+	while (i < argc) {
+		
+		if (strcmp(argv[i], "-f") == 0) {
+			i++;
 
-			Color pixel = img.getPixel(i, y);//
+			if (strcmp(argv[i], "linear") == 0) {
+				Vec3<float> a, c;
+				i++;
+				//Converting strings to integers
+				a.r = stof(argv[i]);
+				i++;
+				a.g = stof(argv[i]);
+				i++;
+				a.b = stof(argv[i]);
+				i++;
+				c.r = stof(argv[i]);
+				i++;
+				c.g = stof(argv[i]);
+				i++;
+				c.b = stof(argv[i]);
+				
+				FilterLinear filterLinear(a, c);
 
-			pixel = 1.0f - pixel;
+				img =  filterLinear << img;
+				cout << "Linear Filter Applied" << endl;
+			}
 
-			img.setPixel(i, y, pixel);//
+			if (strcmp(argv[i], "gamma") == 0) {
+				i++;
+				float gamma = stof(argv[i]);
+				FilterGamma filterGamma(gamma);
 
+				img = filterGamma << img;
+				cout << "Gamma filter Applied" << endl;
+			}
 		}
-	}*/
+		i++;
+	}
 
 
 	// Write image to a new file
-	string tempFile = filename;
-	string copypath = tempFile.substr(0, tempFile.find_first_of('.')) + "_neg.ppm";
+	string tempFile = inputFile;
+	string copypath = "filtered_" + tempFile;
 
 
 
@@ -58,7 +86,6 @@ int main(int argc, char* argv[])
 		cout << "Write failed" << endl;
 		return -1;
 	}
-
 
 	return 0;
 }

@@ -16,7 +16,7 @@ namespace imaging
 
 
 	Color * Image::getRawDataPtr() {
-		//Color * buffer = new Color[getWidth() * getHeight() * sizeof(Color)];
+		Color * buffer = new Color[getWidth() * getHeight() * sizeof(Color)];
 		return buffer;
 	}
 
@@ -38,7 +38,7 @@ namespace imaging
 		pixel_color.g = buffer[position].g;
 		pixel_color.b = buffer[position].b;
 
-		return 1; // pixel_color;
+		return pixel_color; // pixel_color;
 	}
 
 	void  Image::setPixel(unsigned int x, unsigned int y, Color &value) {
@@ -47,11 +47,13 @@ namespace imaging
 
 			return;
 		}
-		unsigned int position = x + getHeight() * y;
-		buffer[position].r = value.r;
-		buffer[position].g = value.g;
-		buffer[position].b = value.b;
-
+		if ((x < width) && (y < height) && (x * y >= 0)) {
+			unsigned int position = x + getHeight() * y;
+			buffer[position].r = value.r;
+			buffer[position].g = value.g;
+			buffer[position].b = value.b;
+			//this->operator()(x, y) = value;
+		}
 		return;
 	}
 
@@ -86,16 +88,19 @@ namespace imaging
 	}
 
 
+
 	Image::Image(unsigned int width, unsigned int height): Array(0,0) {
 		this->width = width;
 		this->height = height;
 	}
 
 
+
+
 	Image::Image(unsigned int width, unsigned int height, const Color * data_ptr) : Array(0, 0) {
 		this->width = width;
 		this->height = height;
-		this->buffer = new Color[width*height * 3]; // γιατί έχω βάλει '3' ; // Image αντι για Color
+		this->buffer = new Color[width*height * 3]; // 
 		for (unsigned int i = 0; i < width*height; i++) { // μήπως setData(0) αντί του for ?? // setData(data_ptr)
 			this->buffer[i] = data_ptr[i];
 		}
@@ -132,6 +137,17 @@ namespace imaging
 		return *this;
 
 	}
+
+
+	
+	Color & Image::operator () (int x, int y) {
+		if (x >= width || y >= height) {
+			std::cout << "Error x and y are coordinated out of bounds " << std::endl;
+		}
+		return buffer[y * height + x];
+	}
+
+
 bool Image::load (const std::string & filename, const std::string & format){
 	  //check if format is PPM
 	  if ( format != "ppm") {

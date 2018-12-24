@@ -149,6 +149,8 @@ namespace imaging
 		 */
 		Image & operator = (const Image & right);
 
+		Color & operator()(int x, int y);
+
 		/*!
 		 * Loads the image data from the specified file, if the extension of the filename matches the format string.
 		 *
