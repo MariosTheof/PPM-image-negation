@@ -1,5 +1,6 @@
 ﻿#include "Filter.h"
 #include "FilterLinear.h"
+#include "Vec3.h"
 	
 
 namespace imaging {
@@ -11,23 +12,24 @@ namespace imaging {
 		Image tempImg;
 		tempImg = image; // προσοχη εδώ
 
-		for (unsigned int i = 0; i < image.getWidth(); i++) {
-			for (unsigned int y = 0; y < image.getHeight(); y++) {
+		for (unsigned int i = 0; i < image.getHeight(); i++) {
+			for (unsigned int y = 0; y < image.getWidth(); y++) {
 
-
-				tempImg(i, y).r = a.r * tempImg(i, y).r + c.r; // ίσως να πρέπει να αλλάξω το 2ο tempImage σε image
-				tempImg(i, y).g = a.g * tempImg(i, y).g + c.g;
-				tempImg(i, y).b = a.b * tempImg(i, y).b + c.b;
-
-
+				Vec3<float> pixel = tempImg.getPixel(i, y);
 				
-	//			[index] = linearPixel[index].clampToLowerBound(0.0);
+				pixel[0] = a.r * pixel[0] + c.r;
+				pixel[1] = a.g * pixel[1] + c.g;
+				pixel[2] = a.b * pixel[2] + c.b;
 
-				//index++;
+				pixel = pixel.clampToLowerBound(0.0);
+				pixel = pixel.clampToUpperBound(1.0);
+				
+				tempImg.setPixel(i, y, pixel);
+		
 			}
 		}
-		tempImg(2, 3) = tempImg(2,3).clampToUpperBound(1.0);
-		tempImg(5,9) = tempImg(4, 6).clampToUpperBound(0.0);
+	
+
 		return tempImg;
 
 	}

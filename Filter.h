@@ -14,7 +14,7 @@ namespace imaging {
 
 		Filter() {};
 
-		Filter(Filter & src) {};
+		Filter(const Filter & src) {};
 
 
 	};

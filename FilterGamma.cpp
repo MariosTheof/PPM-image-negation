@@ -13,27 +13,20 @@ namespace imaging {
 				Image tempImg;
 				tempImg = image;
 				
-				for (unsigned int i = 0; i < image.getWidth(); i++) {
-					for (unsigned int y = 0; y < image.getHeight(); y++) {
-						/*
-						p`(x,y) = p(x,y)^exp
-						*/
-					
+					for (unsigned int i = 0; i < image.getHeight(); i++) {
+						for (unsigned int y = 0; y < image.getWidth(); y++) {
 						
-						//Ready from Vec3.h functions
-						//gammaPixel[index] = gammaPixel[index].clampToUpperBound(1.0);
-						//gammaPixel[index] = gammaPixel[index].clampToLowerBound(0.0);
+							Vec3<float> pixel = tempImg.getPixel(i, y);
 
-			
-						
-						tempImg(i, y).r = pow(tempImg(i, y).r, powerExponent);
-						tempImg(i, y).g = pow(tempImg(i, y).g, powerExponent);
-						tempImg(i, y).b = pow(tempImg(i, y).b, powerExponent);
-						
-						index++;
+							pixel[0] = pow(pixel[0], powerExponent);
+							pixel[1] = pow(pixel[1], powerExponent);
+							pixel[2] = pow(pixel[2], powerExponent);
+
+							tempImg.setPixel(i, y, pixel);
+							
+						}
 					}
-				}
-
+				
 				return tempImg;
 			}
 			else {

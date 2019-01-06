@@ -6,11 +6,9 @@
 #include "Vec3.h"
 
 
+
 namespace math
 {
-	
-	//---------------------------------------------------------------------------------------------
-	// Do NOT modify this section. For the implementation, see comment below the class declaration
 
 	template <typename T>
 	class Array
@@ -50,13 +48,8 @@ namespace math
 
 	};
 
-	// This is a templated class so include its implementation in the header file below this line:
-	//--------------------------------------------------------------------------------------------
-
 	template <typename T>
 	T * Array<T>::getRawDataPtr() {
-		//T * buffer = new T[getWidth() * getHeight() * sizeof(T)];
-
 		return this->buffer.data();
 	}
 
@@ -70,7 +63,7 @@ namespace math
 			std::cerr << "Out of bounds" << std::endl;
 			return t;
 		}
-		unsigned int position = x + getHeight() * y;
+		unsigned int position = x * getHeight() + y;
 		t = buffer[position]; //place buffer[i] in color
 		return t;
 	}
@@ -82,7 +75,7 @@ namespace math
 
 			return;
 		}
-		unsigned int position = x + getHeight() * y;
+		unsigned int position = x * getHeight() + y;
 		//buffer[position].r = value.r;
 		//buffer[position].g = value.g;
 		//buffer[position].b = value.b;
@@ -129,11 +122,7 @@ namespace math
 
 	// Default constructor
 	template <typename T>
-	Array<T>::Array() : width(0), height(0) {
-
-		std::cout << "Array constructor called from image(derived class)" << std::endl;
-
-	}
+	Array<T>::Array() : width(0), height(0) {}
 
 
 	template <typename T>

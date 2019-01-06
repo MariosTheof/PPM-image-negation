@@ -39,4 +39,5 @@ namespace imaging
 	bool WritePPM(const float * data, int w, int h, const char * filename);
 
 } //namespace imaging
+
 #endif#pragma once

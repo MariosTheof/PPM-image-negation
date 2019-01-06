@@ -18,8 +18,6 @@ namespace imaging {
 
 		FilterLinear(Vec3<float> a, Vec3<float> c);
 
-		//FilterLinear(float param);
-
 		FilterLinear(const FilterLinear & src);
 
 

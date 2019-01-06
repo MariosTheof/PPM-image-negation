@@ -9,7 +9,7 @@ namespace imaging {
 
 	protected:
 		float powerExponent;
-		Vec3<float> * gammaPixel;
+		Vec3<float> gammaBuffer;
 
 	public:
 

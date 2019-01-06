@@ -1,19 +1,17 @@
 ﻿#include <iostream>
-#include "Array.h"
+#include <string.h>
 #include "Vec3.h"
-#include "Image.h"
 #include "ppm.h"
+#include "Image.h"
 
 using namespace std;
 using namespace math;
-using namespace imaging;
 
+typedef Vec3<float> Color;
 
 // data accessors
 namespace imaging
 {
-	typedef Vec3<float> Color;
-
 
 	Color * Image::getRawDataPtr() {
 		Color * buffer = new Color[getWidth() * getHeight() * sizeof(Color)];
@@ -22,14 +20,14 @@ namespace imaging
 
 	Color Image::getPixel(unsigned int x, unsigned int y) const {
 
-		Color pixel_color;
+		Color  pixel_color;
 
 		if (x < 0 || y < 0 || x > getHeight() || y > getWidth()) {
 
 			pixel_color.r = 0;
 			pixel_color.g = 0;
 			pixel_color.b = 0;
-			return 0;
+			return pixel_color;
 		}
 
 		unsigned int position = x + getHeight() * y;
@@ -38,7 +36,7 @@ namespace imaging
 		pixel_color.g = buffer[position].g;
 		pixel_color.b = buffer[position].b;
 
-		return pixel_color; // pixel_color;
+		return pixel_color;
 	}
 
 	void  Image::setPixel(unsigned int x, unsigned int y, Color &value) {
@@ -47,13 +45,11 @@ namespace imaging
 
 			return;
 		}
-		if ((x < width) && (y < height) && (x * y >= 0)) {
-			unsigned int position = x + getHeight() * y;
-			buffer[position].r = value.r;
-			buffer[position].g = value.g;
-			buffer[position].b = value.b;
-			//this->operator()(x, y) = value;
-		}
+		unsigned int position = x + getHeight() * y;
+		buffer[position].r = value.r;
+		buffer[position].g = value.g;
+		buffer[position].b = value.b;
+
 		return;
 	}
 
@@ -83,24 +79,21 @@ namespace imaging
 
 	//constructors & destructors
 
-	Image::Image() :Array(0,0) {
+	Image::Image() : width(0), height(0) {
 		buffer = nullptr;
 	}
 
 
-
-	Image::Image(unsigned int width, unsigned int height): Array(0,0) {
+	Image::Image(unsigned int width, unsigned int height) {
 		this->width = width;
 		this->height = height;
 	}
 
 
-
-
-	Image::Image(unsigned int width, unsigned int height, const Color * data_ptr) : Array(0, 0) {
+	Image::Image(unsigned int width, unsigned int height, const Color * data_ptr) {
 		this->width = width;
 		this->height = height;
-		this->buffer = new Color[width*height * 3]; // 
+		this->buffer = new Color[width*height * 3]; // γιατί έχω βάλει '3' ; // Image αντι για Color
 		for (unsigned int i = 0; i < width*height; i++) { // μήπως setData(0) αντί του for ?? // setData(data_ptr)
 			this->buffer[i] = data_ptr[i];
 		}
@@ -108,7 +101,7 @@ namespace imaging
 	}
 
 
-	Image::Image(const Image &src) : Array(0, 0) {
+	Image::Image(const Image &src) {
 		this->height = src.getHeight();
 		this->width = src.getWidth();
 
@@ -138,96 +131,86 @@ namespace imaging
 
 	}
 
-
-	
-	Color & Image::operator () (int x, int y) {
-		if (x >= width || y >= height) {
-			std::cout << "Error x and y are coordinated out of bounds " << std::endl;
+	bool Image::load(const std::string & filename, const std::string & format) {
+		//check if format is PPM
+		if (filename.substr(filename.find_first_of('.')).compare(".ppm") != 0) {
+			cerr << "Only PPM format is supported" << endl;
+			return false;
 		}
-		return buffer[y * height + x];
+
+		const char * input = filename.c_str(); // converts filename to a typical c string. ( char [] )
+
+		int w;
+		int h;
+
+		float * floatBuffer = ReadPPM(input, &w, &h);
+
+		width = w;
+		height = h;
+
+		int size = w * h * 3;
+		//int size2 = w * h * sizeof(Color);
+
+		if (floatBuffer == nullptr) { // or NULL
+			cerr << "file read failed !" << "\n";
+			return false;
+		}
+
+		buffer = getRawDataPtr();
+
+
+		for (int i = 0, y = 0; i < size; i += 3, y++) {
+			
+			buffer[y].r = floatBuffer[i];
+			buffer[y].g = floatBuffer[i + 1];
+			buffer[y].b = floatBuffer[i + 2];
+
+		}
+
+		delete[] floatBuffer;
+
+		return true;
 	}
 
+	bool Image::save(const std::string & filename, const std::string & format) {
 
-bool Image::load (const std::string & filename, const std::string & format){
-	  //check if format is PPM
-	  if ( format != "ppm") {
-		cerr << "Only PPM format is supported" << endl;
-		return false;
-	  }
-
-	  const char * input = filename.c_str(); // converts filename to a typical c string. ( char [] )
-
-	  int w;
-	  int h;
-
-	  float * floatBuffer = ReadPPM(input, &w, &h);
-
-	  width = w;
-	  height = h;
-
-	  int size = w * h *3;
-	  //int size2 = w * h * sizeof(Color);
-
-	  if (floatBuffer == nullptr){ // or NULL
-		cerr << "file read failed !" << "\n";
-		return false;
-	  }
-
-	  buffer = getRawDataPtr();
-
-
-	  for (int i = 0 , y = 0  ; i < size  ; i+=3 , y++) {
-
-			buffer[y].r = floatBuffer[i];
-			buffer[y].g = floatBuffer[i+1];
-			buffer[y].b = floatBuffer[i+2];
-
+		//check if format is PPM
+		if  (filename.substr(filename.find_first_of('.')).compare(".ppm") != 0){
+			cerr << "Only PPM format is supported" << endl;
+			return false;
+		}
+		if (buffer == NULL) {
+			cerr << "buffer is NULL" << endl;
+			return false;
 		}
 
-	  delete[] floatBuffer;
-
-	  return true;
-}
-
-bool Image::save (const std:: string & filename, const std::string & format){
-
-  //check if format is PPM
-  if ( format != "ppm") {
-    cerr << "Only PPM format is supported" << endl;
-    return false;
-  }
-  if (buffer == NULL) {
-    cerr << "buffer is NULL" << endl;
-    return false;
-  }
-
-  const char * output = filename.c_str();
+		const char * output = filename.c_str();
 
 
-  int size = width * height * 3;
-  int size2 = width * height * sizeof(Color);
+		int size = width * height * 3;
+		int size2 = width * height * sizeof(Color);
 
 
 
-  float * floatbuffer = new float[size];
+		float * floatbuffer = new float[size];
 
-  for (int i = 0, y = 0 ; i < size && y < size2 ; i += 3, y++){
+		for (int i = 0, y = 0; i < size && y < size2; i += 3, y++) {
 
-	  floatbuffer[i] = buffer[y].r; // μάλλον ο buffer επιστρέφει null
-	  floatbuffer[i+1] = buffer[y].g;
-	  floatbuffer[i+2] = buffer[y].b;
-  }
+			floatbuffer[i] = buffer[y].r;
+			floatbuffer[i + 1] = buffer[y].g;
+			floatbuffer[i + 2] = buffer[y].b;
+		}
 
 
 
 
-  int w = width, h = height;
-  bool writedone = WritePPM(floatbuffer, w, h, output);
+		int w = width, h = height;
+		bool writedone = WritePPM(floatbuffer, w, h, output);
 
-  delete[] floatbuffer;
+		delete[] floatbuffer;
 
-  return writedone;
+		return writedone;
 
-  }
+	}
 
 }

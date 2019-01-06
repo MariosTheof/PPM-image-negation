@@ -6,8 +6,8 @@
 //
 //
 
-#ifndef _Vec3
-#define _Vec3
+#ifndef _VEC3
+#define _VEC3
 
 #include <cstddef>
 

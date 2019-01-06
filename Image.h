@@ -11,12 +11,12 @@
 
 #include <iostream>
 #include <string>
-
 #include "Array.h"
 #include "Vec3.h"
 
-using namespace std;
+
 using namespace math;
+using namespace std;
 
 /*! The imaging namespace contains every class or function associated with the image storage, compression and manipulation.
  */
@@ -40,8 +40,10 @@ namespace imaging
 		 */
 	typedef Vec3<float> Color;
 
-	class Image: public Array<Color>
+	class Image : public Array<Color>
 	{
+	public:
+
 	protected:
 		Color * buffer;                              //! Holds the image data.
 
@@ -49,13 +51,6 @@ namespace imaging
 			height;		                 //! The height of the image (in pixels)
 
 	public:
-
-
-		enum channel_t {RED = 0, GREEN, BLUE};
-
-
-
-
 		// metric accessors
 
 		/*! Returns the width of the image
@@ -149,8 +144,6 @@ namespace imaging
 		 */
 		Image & operator = (const Image & right);
 
-		Color & operator()(int x, int y);
-
 		/*!
 		 * Loads the image data from the specified file, if the extension of the filename matches the format string.
 		 *
@@ -182,5 +175,5 @@ namespace imaging
 
 	};
 
-} //namespace imaging
+} //namespace //imaging
 #endif
